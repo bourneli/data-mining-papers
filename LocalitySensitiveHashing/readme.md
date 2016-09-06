@@ -59,5 +59,8 @@ LSH在欧式空间的探讨。
 ## 基于欧式空间的LSH总结
 示意图如下
 
-<img src='LSH_create_table.png'/>
+**邻近hash**
 <img src='LSH_query.png'/>
+
+**检索**
+<img src='LSH_create_table.png'/>
