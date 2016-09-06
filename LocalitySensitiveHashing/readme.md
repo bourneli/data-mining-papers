@@ -1,3 +1,10 @@
+ <!--MathJax数学公式-->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML"></script>
+
+
 ## (2014)Clustering by fast search and find of density peaks.pdf
 
 此论文是2014年发表于science上的一篇基于密度的聚类算法，思路虽然比较简单，但是效果还不错。实现过程中，主要难点是空间检索，但可以基于[kd-tree](http://www.cnblogs.com/eyeszjwang/articles/2429382.html)实现。需要找到一个基于spark实现的kd-tree。
@@ -47,3 +54,10 @@ LSH在欧式空间的探讨。
 [概率密度乘法wiki](https://en.wikipedia.org/wiki/Probability_density_function)
 
 [概率密度乘法的问题](http://math.stackexchange.com/a/275668/261790)
+
+
+## 基于欧式空间的LSH总结
+示意图如下
+
+<img src='LSH_create_table.bmp'/>
+<img src='LSH_query.bmp'/>
