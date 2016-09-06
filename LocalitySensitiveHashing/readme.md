@@ -59,5 +59,5 @@ LSH在欧式空间的探讨。
 ## 基于欧式空间的LSH总结
 示意图如下
 
-<img src='LSH_create_table.bmp'/>
-<img src='LSH_query.bmp'/>
+<img src='LSH_create_table.png'/>
+<img src='LSH_query.png'/>
