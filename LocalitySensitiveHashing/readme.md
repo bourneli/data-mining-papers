@@ -55,3 +55,17 @@ LSH在欧式空间的探讨。
 
 **检索**
 <img src='LSH_query.bmp'/>
+
+
+
+## 欧式空间LSH概率推导
+
+$$
+	p(u) = Pr(h(p) = h(q)) = \int_{0}^{w}\frac{1}{u}f(\frac{t}{u})(1-\frac{t}{w})dt
+$$
+
+$w$是投影向量每个单位的宽度，$u$是向量$p$与$q$在原始空间距离。概率密度函数f在欧式空间中，使用标准正太分布概率密度函数。展开成只与u，w有关的概率函数
+
+$$
+	p(u) = \int_{0}^{w}\frac{1}{u}f(\frac{t}{u})dt - \int_{0}^{w}\frac{1}{u}f(\frac{t}{u})\frac{t}{w}dt \\
+$$

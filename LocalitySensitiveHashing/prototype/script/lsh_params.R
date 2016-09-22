@@ -1,0 +1,48 @@
+# 碰撞函数
+root_fun <- function(target) {
+  function(c) {
+    1-2*pnorm(-1/c) + (2*c/sqrt(2*pi))*(exp(-1/(2*c^2))-1) - target
+  }
+  
+}
+
+# 碰撞函数反函数
+g_i <- function(p) {
+  uniroot(root_fun(p),lower = 1e-10, upper = 10, tol = 1e-5)$root
+}
+
+
+# max D = 10
+# 设置w
+r1 <- 0.5
+r2 <- 9.5
+
+p1 <- 0.75
+p2_too_small <- 0.05 # 太小
+p2 <-  0.1
+
+r1 / g_i(p1)
+r2 / g_i(p2)
+r2 / g_i(p2_too_small)
+
+
+w <- (r1 / g_i(p1) + r2 / g_i(p2))/2
+w
+
+# 设置L
+
+k <- 10
+
+rho1 <- 0.99
+rho2 <- 0.01
+
+log(1-rho1) / log(1-p1^k)
+log(1-rho2) / log(1-p2^k)
+
+L <- ceiling(log(1-rho1) / log(1-p1^k))
+
+
+1-(1-p1^k)^L
+1-(1-p2^k)^L
+
+

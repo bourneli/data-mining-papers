@@ -8,8 +8,6 @@ lsh_data$statis_date <- NULL
 lsh_data <- lsh_data[,c(16,1:15)]
 rm(taste)
 
-
-
 # feature必须是matrix
 lsh_table <- function(feature, bucket_width, k=5, l = 10) {
   # 数据维度
@@ -28,8 +26,6 @@ lsh_table <- function(feature, bucket_width, k=5, l = 10) {
   
   rst
 }
-
-
 
 # 批量查询
 lsh_batch_query <- function(lsh_table,id,k=5,l=10) {
@@ -111,7 +107,7 @@ nn_filter <- nn[nn$count > 1,]
 summary(nn_filter)
 nn_filter[which.max(nn_filter$count),]
 
-sid <- fm_query[fm_query$h1==-18457920502 & fm_query$h2==-37992434766,
+sid <- fm_query[fm_query$h1==6509926930 & fm_query$h2==-744409678,
                 c('batch','id')]
 nrow(sid)
 
@@ -176,9 +172,75 @@ for(e in a) {
 
 
 
+L_bound <- function(theata, p, k = 10) {
+  log(1-theata) /log(1-p^k)
+}
+
+
+t1<-0.95
+p1 <- 1/2
+
+L_bound(t1,p1)
+
+t2<-0.15
+p2 <- 1/3
+L_bound(t2,p2)
+
+
+# 欧式概率
+
+root_fun <- function(target) {
+  function(c) {
+    1-2*pnorm(-1/c) + (2*c/sqrt(2*pi))*(exp(-1/(2*c^2))-1) - target
+  }
+  
+}
+root_fun_9 <- root_fun(0.9)
+
+pr <-  root_fun(0)
+
+x <- seq(0,10,by=0.01)
+d <- data.frame(x=x,y=sapply(x,pr))
+
+require(ggplot2)
+text_size <- element_text(size = 19)
+p <- qplot(x,100*y,data=d, geom="line") + xlab("C") + ylab("概率%") + ggtitle("") 
+p <- p + scale_x_continuous(breaks=0:10)
+p <- p + scale_y_continuous(breaks=seq(0,100,by=10))
+p <- p + theme(axis.text = text_size,  axis.title = text_size)
+p
+
+
+# 数值解
+root9 <- uniroot(root_fun_9, lower = 0.001, upper = 10)
+pr(root9$root)
+
+r1 <- sqrt(2)*0.05
+r2 <- sqrt(2)*0.7
+
+p1 <- 0.75
+#p2 <- 0.1
+p2 <-  0.1
+
+g_i <- function(p) {
+  uniroot(root_fun(p),lower = 1e-10, upper = 10, tol = 1e-5)$root
+}
+
+r1 / g_i(p1)
+r2 / g_i(p2)
+
+w <- (r1 / g_i(p1) + r2 / g_i(p2))/2
+w
 
 
 
+k <- 10
+
+rho1 <- 0.99
+rho2 <- 0.1
+
+log(1-rho1) / log(1-p1^k)
+log(1-rho2) / log(1-p2^k)
 
 
 
