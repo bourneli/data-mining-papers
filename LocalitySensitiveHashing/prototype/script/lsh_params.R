@@ -14,8 +14,8 @@ g_i <- function(p) {
 
 # max D = 10
 # 设置w
-r1 <- 0.5
-r2 <- 9.5
+r1 <- 0.05
+r2 <- 1.3
 
 p1 <- 0.75
 p2_too_small <- 0.05 # 太小
@@ -26,12 +26,27 @@ r2 / g_i(p2)
 r2 / g_i(p2_too_small)
 
 
+
 w <- (r1 / g_i(p1) + r2 / g_i(p2))/2
 w
 
+w <- r1 / g_i(p1) 
+w <- r2 / g_i(p2)
+      
+c_1 <- r1/w
+p_1 <- root_fun(0)(c_1)
+p_1
+
+c_2 <- r2/w
+p_2 <- root_fun(0)(c_2)
+p_2
+
+
+
+
 # 设置L
 
-k <- 10
+k <- 8
 
 rho1 <- 0.99
 rho2 <- 0.01
@@ -40,7 +55,7 @@ log(1-rho1) / log(1-p1^k)
 log(1-rho2) / log(1-p2^k)
 
 L <- ceiling(log(1-rho1) / log(1-p1^k))
-
+L
 
 1-(1-p1^k)^L
 1-(1-p2^k)^L
