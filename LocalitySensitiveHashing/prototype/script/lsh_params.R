@@ -14,11 +14,11 @@ g_i <- function(p) {
 
 # max D = 10
 # 设置w
-r1 <- 0.05
+r1 <- 0.01
 r2 <- 1.3
 
 p1 <- 0.75
-p2_too_small <- 0.05 # 太小
+##p2_too_small <- 0.05 # 太小
 p2 <-  0.1
 
 r1 / g_i(p1)
@@ -27,7 +27,7 @@ r2 / g_i(p2_too_small)
 
 
 
-w <- (r1 / g_i(p1) + r2 / g_i(p2))/2
+w <- r1 / g_i(p1) 
 w
 
 w <- r1 / g_i(p1) 
@@ -46,9 +46,9 @@ p_2
 
 # 设置L
 
-k <- 8
+k <- 10
 
-rho1 <- 0.99
+rho1 <- 0.95
 rho2 <- 0.01
 
 log(1-rho1) / log(1-p1^k)
