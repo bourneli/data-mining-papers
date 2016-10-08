@@ -17,15 +17,11 @@ g_i <- function(p) {
 r1 <- 0.01
 r2 <- 1.3
 
-p1 <- 0.75
-##p2_too_small <- 0.05 # 太小
+p1 <- 0.95
 p2 <-  0.1
 
 r1 / g_i(p1)
 r2 / g_i(p2)
-r2 / g_i(p2_too_small)
-
-
 
 w <- r1 / g_i(p1) 
 w
@@ -48,7 +44,7 @@ p_2
 
 k <- 10
 
-rho1 <- 0.95
+rho1 <- 0.99
 rho2 <- 0.01
 
 log(1-rho1) / log(1-p1^k)
@@ -56,6 +52,8 @@ log(1-rho2) / log(1-p2^k)
 
 L <- ceiling(log(1-rho1) / log(1-p1^k))
 L
+
+L <- 6
 
 1-(1-p1^k)^L
 1-(1-p2^k)^L
