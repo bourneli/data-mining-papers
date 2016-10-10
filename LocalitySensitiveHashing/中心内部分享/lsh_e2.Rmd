@@ -1,5 +1,5 @@
 ---
-title: "欧式空间的局部敏感哈希应用分享"
+title: "欧式空间的LSH应用分享"
 author: "bourneli"
 date: "2016年10月"
 output: 
@@ -66,6 +66,10 @@ $w$将投射结果严格的划分为不同的单位，$w$十分重要！
 
 * 太大，较远的对象也设hash到一个单位里，计算量仍然十分大；
 * 太小，很近的对象也无法hash到一起，导致找不到相似的对象。
+
+## 计算方法--欧式空间的LSH投影示意图
+
+<img src='e2_lsh_project_demo.bmp' />
 
 
 ## 计算方法--常系数的概率密度函数变换
@@ -183,13 +187,89 @@ $$
 
 并不是所有的参数都可以得到合适的w，比如上面的$p_2=0.05$，那么上界是0.16，**小于下界**，得不到合适的w。
 
-## 计算方法--LSH加强
+## 计算方法--LSH强化
 
-## 计算方法--桶的数量评估
+思路：使用**逻辑与**和**逻辑或**提高LSH函数的上界，降低LSH的下界。
 
-## 应用于实践--计算流程总结
+**逻辑与** $(r_1, r_2, p_1^r, p_2^r) - sensitive$
 
-## 应用于实践 -- 踩坑总结
+**逻辑或** $(r_1, r_2, 1-(1-p_1)^r, 1-(1-p_2)^r) - sensitive$
+
+**逻辑与嵌套逻辑或** $(r_1, r_2, 1-(1-p_1^k)^L, 1-(1-p_2^k)^L) - sensitive$
+
+去掉那些碰巧hash到一起的情况，如果真的很近，在L组计算中，总有一组k个hash均相等。
+
+
+## 计算方法--估算L
+
+k用来避免局部组合爆炸，一般$k = 10$。在k固定时，需要估算适当的L和组合后的概率。令组合$\rho_1,\rho_2$为强化后的上下界，
+
+$$
+  \rho_1 \le 1-(1-p_1^k)^L, \rho_2 \ge 1-(1-p_2^k)^L
+$$
+
+所以可以得到L的范围
+
+$$
+   \frac{\ln{(1-\rho_1)}}{\ln{(1-p_1^k)}} \le L \le \frac{\ln{(1-\rho_2)}}{\ln{(1-p_2^k)}}
+$$
+
+与w一样，并不是所有的目标都可以达到。假设目标是$\rho_1=0.99 > 0.97, \rho_2=0.01 < 0.1$,L至少为6可以达到此目标。
+
+## 应用与实践--建表示意图
+
+<img src='lsh_create_table_2.png'/>
+
+
+## 应用与实践--查询示意图
+<img src='lsh_query_2.png'/>
+
+## 应用与实践--概况
+
+使用spark实现离线版本（spark无法实现在线查询版本）。
+
+$3千万 \times 15$的数据，耗时13小时，得到138亿相似对。spark集群配置如下
+
+    num-executors 100
+    driver-memory 1G
+    executor-cores 2
+    executor-memory 10G
+    spark.default.parallelism=200
+    spark.storage.memoryFraction=0.8
+    spark.yarn.allocation.executor.maxMemory=35G
+    spark.driver.maxResultSize=4G
+
+## 应用与实践--优化1：分布合并hash桶
+
+LSH算法在每个桶中，需要按k个键合并。总共需要合并L个hash桶。最开始是先分别将L个桶计算完后，然后合并去重。这样需要同时将L个桶的数据保存在内存中，非常消耗空间。所以，优化的方法是按每n(<L)个桶合并，这样最多也只需要同事保留n个hash桶的空间。
+
+[源代码参考这里](http://git.oa.com/bourneli/my_dm_ml_library/blob/master/src/main/scala/org/apache/spark/mllib/lsh/tencent/LSHForE2.scala#L132)
+
+
+## 应用与实践--优化2：巨片随机化
+
+在LSH过程中，如果数据分布非常集中，那么必然导致hash桶中一个hash key上聚集非常多的数据。比如在我的试验数据中，300万的数据，有一个hash key上聚集了1.7万的数据，称此现象为巨片。如果对这些数据进行排列组合，那么单个partition的突破spark 2GB限制，导致计算异常结束。解决方法是设置一个阀值，如果单个key聚集的对象数量高于这个阀值，就随机取样少量相识对象。这样效果不会太差，因为能够聚到一起的，说明本来就很相似。但是效率却得到了极大提升。
+
+[源代码参考这里](http://git.oa.com/bourneli/my_dm_ml_library/blob/master/src/main/scala/org/apache/spark/mllib/lsh/tencent/LSHForE2.scala#L110)
+
+## 应用与实践--优化3：数据id变成整型
+
+有些数据的id是字符串型，该数据十分消耗内存，建议通过hash的方法将其转成整型。比如我的试验数据集合，原始id是32个字符串，通过hash变成Long后，只有8个字节，空间节省了75%。虽然hash过程中可能存在一定冲撞，但应是小概率时间，可以忽略。
+
+[源代码参考这里](http://git.oa.com/bourneli/my_dm_ml_library/blob/master/src/main/scala/org/apache/spark/mllib/lsh/tencent/LSHForE2.scala#L44)
+
+
+## 应用与实践--优化4：减少频繁Iterable转IndexedSeq
+
+这个地方是没有注意的细节，修改后效率极大提升，所以还是记录于此。GroupByKey后得到的对象是Iterable，**无法随机访问**，必须转成IndexedSeq对象。修改之前，每次都在随机访问时转成IndexedSeq，相当消耗性能，尤其部分倾斜的分区计算相当滞后。修改后，只转换一次IndexedSeq，后续访问重复利用，性能得到了极大的提升。
+ 
+[源代码参考这里](http://git.oa.com/bourneli/my_dm_ml_library/blob/master/src/main/scala/org/apache/spark/mllib/lsh/tencent/LSHForE2.scala#L115) 
+
+## 应用与实践--优化5：手动Hash分区
+
+这个问题可以参考[StackoverFlow中问题][4]。在**优化1-分布合并hash桶**时，结果需要调用partitionBy(new HashPartitioner(parts))，将结果转成ShuffledRDD。因为distinct操作可以最大化利用ShuffledRDD的，减少不必要的重新排序和网络传输。
+
+[源代码参考121和138行](http://git.oa.com/bourneli/my_dm_ml_library/blob/master/src/main/scala/org/apache/spark/mllib/lsh/tencent/LSHForE2.scala#L121)
 
 ## 参考文献
 
@@ -200,7 +280,7 @@ $$
 * [StackOverflow spark: How to merge shuffled rdd efficiently?][5]
 * [Mining of Massive Datasets,第二版， 3.6.3节](http://www.mmds.org/)
 * $E^2$LSH 0.1 User Manual, Alexandr Andoni, Piotr Indyk, June 21, 2005, Section 3.5.2
-* (2004)Locality-Sensitive Hashing Scheme Based on p-Stable.pdf
+* (2004)Locality-Sensitive Hashing Scheme Based on p-Stable
 * (2008)Locality-Sensitive Hashing for Finding Nearest Neighbors
 
 [1]: http://bourneli.github.io/probability/lsh/2016/09/15/lsh_eulidian_1.html
@@ -252,5 +332,22 @@ p1 <- 0.97;p2 <- 0.1 #p2 <-  0.05
 
 r1 / g_i(p1) # 下界
 r2 / g_i(p2) # 上界
+
+```
+
+## 附录4--L估计试验
+
+```{r L_param,eval=FALSE}
+k <- 10
+p1 <- 0.97
+p2 <-  0.1
+rho1 <- 0.99
+rho2 <- 0.01
+
+log(1-rho1) / log(1-p1^k)
+log(1-rho2) / log(1-p2^k)
+
+L <- ceiling(log(1-rho1) / log(1-p1^k))
+L
 
 ```
