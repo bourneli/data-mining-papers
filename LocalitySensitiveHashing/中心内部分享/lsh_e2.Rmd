@@ -1,9 +1,10 @@
 ---
-title: "欧式空间的LSH应用分享"
+title: "欧式空间的局部敏感哈希(LSH)应用分享"
 author: "bourneli"
 date: "2016年10月"
 output:
-  slidy_presentation: default
+  slidy_presentation: 
+    footer: "数据挖掘应用中心"
   ioslides_presentation:
     widescreen: yes
 ---
@@ -28,15 +29,16 @@ LSH主要解决**高纬度最邻近查找**问题，是一种**近似**算法，
 3. 音乐检索
 4. 指纹匹配
 5. 图像检索
+6. 相似用户匹配推荐
 
 ## 计算方法--核心思想
 
-主要思路是设计一类hash函数，将那些比较类似的对象hash到一起，不同的对象的hash到不同的地方。hash过程相当于一种**过滤**机制，缩小检索范围。
+主要思路是设计一类局部敏感函数，将那些比较类似的对象hash到一起，不同的对象的hash到不同的地方。hash过程相当于一种**过滤**机制，缩小检索范围。
 
 最近邻居蛮力计算方法需要的时间复杂度$O(n^2)$，而使用LSH，可以在保证错误率很低的情况下，时间复杂度降到$O(n)$。在不需要准确最近邻居的应用场景，可以大规模应用，比如$n$达到亿级甚至更多。
 
 
-## 计算方法--$(r_1,r_2,p_1,p_2)-sensitive$
+## 计算方法--局部敏感函数定义
 
 定义：函数集合$H=\lbrace h: S \rightarrow U \rbrace$；任意向量$q,v \in S$；U是整数集合；$B(v,r) = \lbrace q \in X \| d(v,q) \le r \rbrace$，表示以点$v$为中心，距离为r范围内的所有点的集合。
 
@@ -50,22 +52,20 @@ $$
 直观解释就是将相距较近($r_1$以内)的向量hash到一起的概率要大($p_1$较接近1)；距离较远($r_2$以外，且$r_2 > r_1$)的对象hash到一起的概率小($p_2$较接近0)。
 
 
-## 计算方法--欧式空间的LSH局部敏感函数
+## 计算方法--欧式空间的局部敏感函数
 
-将n维向量随机射到一个向量，使用向量点乘，由于投射向量不是单位向量，所以严格意义上不能称之为投影。投射hash算法如下:
+将n维向量随机射到一个向量，使用向量点乘，由于投射向量不是单位向量，所以严格意义上不能称之为投影。投射算法如下:
 
 $$
 	h(v) = \left\lfloor \frac{a \bullet v + b}{w} \right\rfloor
 $$
-
-其中
 
 * $b \in [0,w]$是随机量，
 * $a \in R^n,a_i \sim N(0,1)$，是被投射的向量。
 
 
 
-## 计算方法--欧式空间的LSH投影示意图
+## 计算方法--欧式空间的局部敏感投射示意图
 
 <img src='e2_lsh_project_demo.bmp' />
 
@@ -74,29 +74,35 @@ $w$是单位长度，十分重要！
 * w太大，较远的对象也设hash到一个单位里，计算量仍然十分大；
 * w太小，很近的对象也无法hash到一起，导致找不到相似的对象。
 
+**需要知道向量距离与投射碰撞概率的关系？**
+
+
 ## 计算方法--常系数的概率密度函数变换
 
-如果$X$与$cY$的分布相同,$c \gt 0$为常数，并且已知X的概率密度$f_X(x)$,计算Y的概率密度函数$f_Y(y)$?推导如下：
+如果$Y$与$cX$具有相同分布,$c \gt 0$为常数，并且已知X的概率密度$f_X(x)$,计算Y的概率密度函数$f_Y(y)$?
 
+核心思想是将概率密度函数转成累积分布概率函数，因为概率密度函数在任意一点的概率为0，直接代入没有意义，推导如下：
+
+**概率密度函数与累计分布函数的关系**
 $$
 	F_X(x)=Pr(X \le x)=\int_{-\infty}^x f_X(t)dt 
-	\Rightarrow f_X(x) = \frac{d F_X(x)}{dx} \qquad(1)
+	\Rightarrow f_X(x) = \frac{d F_X(x)}{dx}
 $$
 
-
+**随机变量$cY$与$X$的关系**
 $$
 	F_Y(y) = Pr(Y \le y) 
            = Pr(cX \le y) 
            = Pr(X \le \frac{y}{c}) 
-           = F_X(\frac{y}{c})  \qquad (2)
+           = F_X(\frac{y}{c})
+$$
+
+**复合函数求导**
+$$
+	f_Y(y) = \frac{d F_X(\frac{y}{c})}{dy} =  \frac{1}{c} f_X(\frac{y}{c})
 $$
 
 
-$$
-	f_Y(y) = \frac{d F_X(\frac{y}{c})}{dy} =  \frac{1}{c} f_X(\frac{y}{c}) \qquad(3)
-$$
-
-核心思想是将概率密度函数转成累积分布概率函数，概率密度任意一点的概率为0。
 
 
 ## 计算方法--稳定分布
@@ -138,6 +144,8 @@ p(w,u) &= Pr(h(p) = h(q)) \\
 &=1 - 2F(-\frac{w}{u}) + \sqrt{\frac{2}{\pi}}\frac{u}{w}(e^{-\frac{w^2}{2u^2}}-1) \\
 \end{align}
 $$
+
+其中f与F是分别是标准正太分布**概率密度函数**和**累积分布函数**。
 
 令$c=\frac{u}{w}$，
  
@@ -293,7 +301,7 @@ LSH算法在每个桶中，需要按k个键合并。总共需要合并L个hash�
 
 $$
 \begin{align}
-	p(u) = f(u,w) &= 2(\int_{0}^{w}\frac{1}{u}f(\frac{t}{u})dt - \int_{0}^{w}\frac{1}{u}f(\frac{t}{u})\frac{t}{w}dt) \\
+	p(u) &= 2(\int_{0}^{w}\frac{1}{u}f(\frac{t}{u})dt - \int_{0}^{w}\frac{1}{u}f(\frac{t}{u})\frac{t}{w}dt) \\
 				  &= 2(\int_{0}^{w}f(\frac{t}{u})d\frac{t}{u} - \int_{0}^{w}\frac{1}{u\sqrt{2\pi}}e^{-\frac{t^2}{2u^2}}\frac{t}{w}dt) \\
 				  &= 2(\int_{0}^{\frac{w}{u}}f(x)dx - \frac{-u}{\sqrt{2\pi}w}\int_{0}^{w}e^{-\frac{t^2}{2u^2}}d(-\frac{t^2}{2u^2})) \\
 				  &= 2(\frac{1}{2} - F(-\frac{w}{u}) + \frac{u}{\sqrt{2\pi}w}e^{-\frac{t^2}{2u^2}}|^w_0) \\
@@ -301,6 +309,7 @@ $$
 \end{align}
 $$
  
+f和F分别为标准正太分布的概率密度函数和累积分布函数。 
 
 ## 附录2--碰撞函数单调性
 
