@@ -168,8 +168,8 @@ p(w,u) &amp;= Pr(h(p) = h(q)) \\
 \]</span></p>
 <ul>
 <li>如果没有倾向性，选取区间的中间。</li>
-<li>如果需要对相近的用户进行更严格的限制，w取下限</li>
-<li>如果对比较远的用户有严格的限制，w可以取上限。</li>
+<li>如果需严格限制，w取下限</li>
+<li>如果需要宽松的限制，w取上限。</li>
 </ul>
 <p>并不是所有的参数都可以得到合适的w，比如上面的<span class="math">\(p_2=0.05\)</span>，那么上界是0.16，<strong>小于下界</strong>，得不到合适的w。</p>
 </div>
@@ -202,8 +202,8 @@ p(w,u) &amp;= Pr(h(p) = h(q)) \\
 </div>
 <div class="slide section level2">
 <h1>应用与实践–概况</h1>
-<p>spark实现离线版本</p>
-<p><span class="math">\(3千万 \times 15\)</span>的数据，耗时13小时，得到138亿相似对。spark集群配置如下</p>
+<p><strong>性能</strong></p>
+<p>spark实现离线算法。<span class="math">\(3千万 \times 15\)</span>的数据，耗时13小时，138亿相似对。spark集群配置如下</p>
 <pre><code>num-executors 100
 driver-memory 1G
 executor-cores 2
@@ -212,6 +212,115 @@ spark.default.parallelism=200
 spark.storage.memoryFraction=0.8
 spark.yarn.allocation.executor.maxMemory=35G
 spark.driver.maxResultSize=4G</code></pre>
+<p><strong>结果样本</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">坦克</th>
+<th align="center">战士</th>
+<th align="center">法师</th>
+<th align="center">刺客</th>
+<th align="center">辅助</th>
+<th align="center">射手</th>
+<th align="center">突进</th>
+<th align="center">收割</th>
+<th align="center">团控</th>
+<th align="center">远程消耗</th>
+<th align="center">先手</th>
+<th align="center">团队增益</th>
+<th align="center">其他</th>
+<th align="center">吸血</th>
+<th align="center">回复</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0.08</td>
+<td align="center">0.31</td>
+<td align="center">0.05</td>
+<td align="center">0.39</td>
+<td align="center">0.02</td>
+<td align="center">0.16</td>
+<td align="center">0.44</td>
+<td align="center">0.22</td>
+<td align="center">0.22</td>
+<td align="center">0.05</td>
+<td align="center">0.03</td>
+<td align="center">0</td>
+<td align="center">0.03</td>
+<td align="center">0</td>
+<td align="center">0.02</td>
+</tr>
+<tr class="even">
+<td align="center">0.11</td>
+<td align="center">0.26</td>
+<td align="center">0.13</td>
+<td align="center">0.34</td>
+<td align="center">0.00</td>
+<td align="center">0.16</td>
+<td align="center">0.42</td>
+<td align="center">0.21</td>
+<td align="center">0.18</td>
+<td align="center">0.05</td>
+<td align="center">0.08</td>
+<td align="center">0</td>
+<td align="center">0.05</td>
+<td align="center">0</td>
+<td align="center">0.00</td>
+</tr>
+<tr class="odd">
+<td align="center">0.00</td>
+<td align="center">0.37</td>
+<td align="center">0.06</td>
+<td align="center">0.37</td>
+<td align="center">0.00</td>
+<td align="center">0.21</td>
+<td align="center">0.40</td>
+<td align="center">0.23</td>
+<td align="center">0.22</td>
+<td align="center">0.08</td>
+<td align="center">0.08</td>
+<td align="center">0</td>
+<td align="center">0.00</td>
+<td align="center">0</td>
+<td align="center">0.00</td>
+</tr>
+<tr class="even">
+<td align="center">0.04</td>
+<td align="center">0.34</td>
+<td align="center">0.09</td>
+<td align="center">0.33</td>
+<td align="center">0.01</td>
+<td align="center">0.19</td>
+<td align="center">0.43</td>
+<td align="center">0.20</td>
+<td align="center">0.20</td>
+<td align="center">0.06</td>
+<td align="center">0.07</td>
+<td align="center">0</td>
+<td align="center">0.02</td>
+<td align="center">0</td>
+<td align="center">0.01</td>
+</tr>
+<tr class="odd">
+<td align="center">0.08</td>
+<td align="center">0.29</td>
+<td align="center">0.08</td>
+<td align="center">0.34</td>
+<td align="center">0.05</td>
+<td align="center">0.16</td>
+<td align="center">0.45</td>
+<td align="center">0.18</td>
+<td align="center">0.21</td>
+<td align="center">0.03</td>
+<td align="center">0.08</td>
+<td align="center">0</td>
+<td align="center">0.05</td>
+<td align="center">0</td>
+<td align="center">0.00</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="1hash" class="slide section level2">
 <h1>应用与实践–优化1：分布合并hash桶</h1>
@@ -276,8 +385,8 @@ spark.driver.maxResultSize=4G</code></pre>
     \end{align}
 \]</span></p>
 </div>
-<div id="3w" class="slide section level2">
-<h1>附录3–w估计试验</h1>
+<div id="3wr" class="slide section level2">
+<h1>附录3–w估计R代码</h1>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 碰撞函数</span>
 root_fun &lt;-<span class="st"> </span>function(target) {
   function(c) {
@@ -295,8 +404,8 @@ p1 &lt;-<span class="st"> </span><span class="fl">0.97</span>;p2 &lt;-<span clas
 r1 /<span class="st"> </span><span class="kw">g_i</span>(p1) <span class="co"># 下界</span>
 r2 /<span class="st"> </span><span class="kw">g_i</span>(p2) <span class="co"># 上界</span></code></pre>
 </div>
-<div id="4l" class="slide section level2">
-<h1>附录4–L估计试验</h1>
+<div id="4lr" class="slide section level2">
+<h1>附录4–L估计R代码</h1>
 <pre class="sourceCode r"><code class="sourceCode r">k &lt;-<span class="st"> </span><span class="dv">10</span>
 p1 &lt;-<span class="st"> </span><span class="fl">0.97</span>
 p2 &lt;-<span class="st">  </span><span class="fl">0.1</span>

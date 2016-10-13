@@ -234,9 +234,9 @@ $$
 
 ## 应用与实践--概况
 
-spark实现离线版本
+**性能**
 
-$3千万 \times 15$的数据，耗时13小时，得到138亿相似对。spark集群配置如下
+spark实现离线算法。$3千万 \times 15$的数据，耗时13小时，138亿相似对。spark集群配置如下
 
     num-executors 100
     driver-memory 1G
@@ -246,6 +246,15 @@ $3千万 \times 15$的数据，耗时13小时，得到138亿相似对。spark集
     spark.storage.memoryFraction=0.8
     spark.yarn.allocation.executor.maxMemory=35G
     spark.driver.maxResultSize=4G
+   
+**结果样本**    
+```{r result_sample, message=F, echo=F,warning=F}
+exp_data <- read.csv("lsh_sample.csv",fileEncoding = "utf8")
+set.seed(9087)
+exp_data <- exp_data[sample(1:nrow(exp_data),5), 6:20]
+require(knitr)
+kable(exp_data, digits=2, align = c('r','r','r','r','r','r'),row.names=F) 
+```
 
 ## 应用与实践--优化1：分布合并hash桶
 
