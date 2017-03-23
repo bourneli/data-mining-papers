@@ -157,6 +157,34 @@ sgd_momentum <- function(gradient_fun, cost_fun) {
   }
 }
 
-
+############################################################
+# 动量随机梯度递减优化算法
+# graidnet_fun 梯度计算函数
+# cost_fun 开销计算函数
+############################################################
+sgd_nag <- function(gradient_fun, cost_fun) {
+  function(x,y,w, alpha,p=0.9, max_iter = 1000) {
+    
+    v <- w
+    rst <- data.frame()
+    for(r in 1:max_iter) {
+      
+      i <- sample(length(w),1)
+      v <- p*v + alpha * gradient_fun(x,y,w-p*v,i)
+      w <- w - v
+      current_cost <- cost_fun(x,y,w)
+      
+      current_result <- data.frame(
+        round = r, 
+        cost = current_cost,
+        type = 'sgd_nag'
+      )
+      print(current_result)
+      rst <- rbind(rst, current_result)
+    }
+    print(w)
+    rst
+  }
+}
 
 

@@ -91,7 +91,7 @@ rst_sgd_m <- my_sgd_m(
   my_y,
   my_w,
   alpha = learn_rate,
-  p=0.1, 
+  p=0.25, 
   max_iter = max_iter
 )
 qplot(x=round, y = cost,data = rst_sgd_m, geom = 'line' )
@@ -109,4 +109,36 @@ p <- p + geom_line()
 p
 
 ggsave(p,file='converage_4.png',width=8,height=6)
+
+
+
+################################################
+# 动量随机梯度递减NAG
+################################################
+
+my_sgd_nag <- sgd_nag(
+  gradient_fun = linear_regression_gradient_single,
+  cost_fun = linear_regression_cost
+)
+rst_sgd_nag <- my_sgd_nag(
+  my_x,
+  my_y,
+  my_w,
+  alpha = learn_rate,
+  p=0.25, 
+  max_iter = max_iter
+)
+
+# 观察四个算法cost的收敛速度
+combine_result <- rbind(
+  # rst_gd,
+  # rst_sgd,
+  # rst_gd_m,
+  rst_sgd_m,
+  rst_sgd_nag
+)
+p <- ggplot(combine_result, aes(x=round,y = cost,color = type))
+p <- p + geom_line()
+p
+
 
