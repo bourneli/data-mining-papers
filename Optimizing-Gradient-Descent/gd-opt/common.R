@@ -13,7 +13,7 @@ linear_regression_gradient_batch <- function(x,y,w) {
 
 
 ############################################################
-# 线性规划梯度(单独一个，适用于SGD)
+# 线性回归梯度(单独一个，适用于SGD)
 # x 输入，列为特征，共n列，m个特征（包括截距）
 # y 列向量
 # w 权重，包括截距
@@ -21,7 +21,7 @@ linear_regression_gradient_batch <- function(x,y,w) {
 ############################################################
 linear_regression_gradient_single <- function(x,y,w,i) {
   x_i <- x[,i]
-  delta_y_i <- x_i %*% w - y[i]
+  delta_y_i <- t(x_i) %*% w - y[i]
   x_i*delta_y_i
 }
 
@@ -49,6 +49,35 @@ logistic_regression_cost <- function(x,y,w) {
   t(col_cost) %*% col_cost 
 }
 
+############################################################
+# 逻辑回归梯度（单独一个，适合SGD）
+# 参考： https://math.stackexchange.com/questions/477207/derivative-of-cost-function-for-logistic-regression
+# x 输入，列为特征，共n列，m个特征（包括截距）
+# y 列向量
+# w 权重，包括截距
+# i 第几个x
+############################################################
+logistic_regression_gradient_single <- function(x,y,w,i) {
+  x_i <- x[,i]
+  pred <- 1 / (1 + exp(-t(x_i) %*% w))
+  delta_y_i <- pred - y[i]
+  x_i * delta_y_i
+}
+
+############################################################
+# 逻辑回归梯度
+# 参考： https://math.stackexchange.com/questions/477207/derivative-of-cost-function-for-logistic-regression
+# x 输入，列为特征，共n列，m个特征（包括截距）
+# y 列向量
+# w 权重，包括截距
+############################################################
+logistic_regression_gradient_batch <- function(x,y,w,i) {
+
+  pred <- 1 / (1 + exp(-t(x) %*% w))
+  delta_y <- pred - y
+  
+  x %*% delta_y / length(y)
+}
 
 
 ############################################################
