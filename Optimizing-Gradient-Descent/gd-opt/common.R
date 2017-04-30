@@ -98,10 +98,10 @@ gd <- function(gradient_fun, cost_fun) {
         cost = current_cost, 
         type = 'gd'
       )
-      print(current_result)
+      # print(current_result)
       rst <- rbind(rst, current_result)
     }
-    print(w)
+    #print(w)
     rst
   }
 }
@@ -127,10 +127,10 @@ sgd <- function(gradient_fun, cost_fun) {
         cost = current_cost,
         type = 'sgd'
       )
-      print(current_result)
+      #print(current_result)
       rst <- rbind(rst, current_result)
     }
-    print(w)
+    #print(w)
     rst
   }
 }
@@ -157,10 +157,10 @@ gd_momentum <- function(gradient_fun, cost_fun) {
         cost = current_cost,
         type = 'gd_m'
       )
-      print(current_result)
+      #print(current_result)
       rst <- rbind(rst, current_result)
     }
-    print(w)
+    #print(w)
     rst
   }
 }
@@ -188,10 +188,10 @@ sgd_momentum <- function(gradient_fun, cost_fun) {
         cost = current_cost,
         type = 'sgd_m'
       )
-      print(current_result)
+      #print(current_result)
       rst <- rbind(rst, current_result)
     }
-    print(w)
+    #print(w)
     rst
   }
 }
@@ -221,7 +221,7 @@ sgd_nag <- function(gradient_fun, cost_fun) {
       print(current_result)
       rst <- rbind(rst, current_result)
     }
-    print(w)
+    #print(w)
     rst
   }
 }

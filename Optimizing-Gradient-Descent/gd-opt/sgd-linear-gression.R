@@ -9,19 +9,27 @@ fit  <- lm(Petal.Width ~ Sepal.Length + Sepal.Width + Petal.Length, data = iris)
 summary(fit)
 
 
-# 准备数据
-my_x <- t(as.matrix(cbind(iris[,1:3],1)))
-my_y <- as.matrix(iris[,4])
+# # 准备数据1:iris
+# my_x <- t(as.matrix(cbind(iris[,1:3],1)))
+# my_y <- as.matrix(iris[,4])
+# set.seed(1234)
+# my_w <- as.matrix(rnorm(4))
+
+
+# 准备数据2：mtcars
+my_x <- t(as.matrix(cbind(1,mtcars[,2:11])))
+my_y <- as.matrix(mtcars[,1])
 set.seed(1234)
-my_w <- as.matrix(rnorm(4))
+my_w <- as.matrix(rnorm(11))
+
 
 # 测试效果
 linear_regression_gradient_single(my_x, my_y, my_w,2)
 linear_regression_cost(my_x,my_y,my_w)
 
 # 公共参数
-max_iter <- 1500
-learn_rate <- 0.0001
+max_iter <- 2500
+learn_rate <- 0.000001
 
 ################################################
 # 批量梯度递减
@@ -63,7 +71,7 @@ rst_gd_m <- my_gd_m(
   my_y,
   my_w,
   alpha=learn_rate,
-  p=0.1, 
+  p=0.4, 
   maxIter = max_iter
 )
 
@@ -91,7 +99,7 @@ rst_sgd_m <- my_sgd_m(
   my_y,
   my_w,
   alpha = learn_rate,
-  p=0.25, 
+  p=0.4, 
   max_iter = max_iter
 )
 qplot(x=round, y = cost,data = rst_sgd_m, geom = 'line' )
