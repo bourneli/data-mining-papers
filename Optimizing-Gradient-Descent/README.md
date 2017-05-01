@@ -60,3 +60,11 @@ $$
 ### Result 2证明：比例变化
 
 转成一个 $\alpha$关于 $k_i$的函数
+
+
+## (2013)On the importance of initialization and momentum in deep learning
+
+深度学习中，利用Nesterov's Accelerated Gradient加速梯度递减。
+
+
+Stackoverflow中关于动量与NAG的讨论：[What's the difference between momentum based gradient descent, and Nesterov's accelerated gradient descent?](https://stats.stackexchange.com/questions/179915/whats-the-difference-between-momentum-based-gradient-descent-and-nesterovs-ac)
