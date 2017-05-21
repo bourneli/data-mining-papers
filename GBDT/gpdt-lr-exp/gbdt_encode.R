@@ -24,13 +24,19 @@ gbm3 <- gbm(Petal.Width~., # formula
 
 
 
-
+## 测试单行
 x <- iris[55,c(1:3,5)]
 x
 pretty.gbm.tree(gbm3,1)
 gbdt_encode_one(gbm3,1,x) # ok
 rst <- gbdt_encode(gbm3,x)
 rst
-matrix(rst,ncol = 10)
+
+ 
+## 多行测试
+my_rst <- gbdt_encode(gbm3,iris[,c(1:3,5)])
+dim(my_rst)
+head(my_rst)
+summary(my_rst)
 
 

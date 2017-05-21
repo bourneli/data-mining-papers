@@ -48,20 +48,78 @@ gbdt_encode_one <- function(model, tree_index, x) {
 }
 
 ###########################################################
-# 根据gbdt模型，编码特征x
+# 根据gbdt模型，需要编码特征x
 # @param model gbm模型
 # @param x 特征，顺序必须与模型一致
 # @return 编码特征
 ###########################################################
 gbdt_encode <- function(model, x) {
-
-  rst <- sapply(1:model$n.trees, function(i) {
-    this_code <- gbdt_encode_one(model, i, x)
-    
-    tree_struct <- pretty.gbm.tree(model, i)
-    all_leaf_code <- row.names(subset(tree_struct,tree_struct$SplitVar == -1))
-    as.numeric(all_leaf_code == this_code)    
-  })
   
-  as.vector(rst)
+  require(plyr)
+  
+  adply(x, 1, function(x) {
+    rst <- sapply(1:model$n.trees, function(i) {
+      this_code <- gbdt_encode_one(model, i, x)
+      
+      tree_struct <- pretty.gbm.tree(model, i)
+      all_leaf_code <- row.names(subset(tree_struct,tree_struct$SplitVar == -1))
+      as.numeric(all_leaf_code == this_code)    
+    })
+    
+    rst <-as.vector(rst)
+    names(rst) <- paste("gbdt_node_", 1:length(rst),sep='')
+    rst
+    
+  })
 }
+
+###########################################################
+# 生成k fold交叉验证的索引
+# n 总样本量
+# k 交叉数量
+###########################################################
+k_fold_index <- function(n, k = 5) {
+  index <- rep(1:k, length.out = n)
+  sample(index, length(index), replace = FALSE)
+} 
+
+
+# 二元分类指标计算
+binaryMetric <- function(
+  positive_tag,
+  true_type,
+  pred_type,
+  true_prob,
+  pred_prob
+){
+  prec <- Precision(
+    y_pred = pred_type,
+    y_true = true_type, 
+    positive = positive_tag
+  )
+  recall <- Recall(
+    y_pred = pred_type,
+    y_true = true_type, 
+    positive = positive_tag
+  )
+  auc <- AUC(
+    y_pred = pred_prob[, positive_tag],
+    y_true = true_prob
+  )
+  f1 <- F1_Score(
+    y_pred = pred_type,
+    y_true = true_type,
+    positive = positive_tag
+  )
+  accuracy <- Accuracy(y_pred = pred_type, y_true = true_type)
+  
+  # 记录结果
+  data.frame(
+    precision = prec,
+    recall = recall,
+    auc = auc,
+    f1 = f1,
+    accuracy = accuracy
+  )
+}
+
