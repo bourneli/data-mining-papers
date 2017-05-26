@@ -10,7 +10,8 @@
 require(mlbench)
 require(caret)
 require(MLmetrics)
-library(ade4)  # one-hot-encoding for factor
+require(plyr)
+require(ade4)  # one-hot-encoding for factor
 
 ###################################################################
 # Satellite数据
@@ -287,5 +288,67 @@ ddply(
 )
 
 write.csv(result, file = result_file, quote=F, row.names = F)
+
+
+
+
+######################################################
+# 分析模型效果
+######################################################
+
+file_list <- list(
+  c('diabetes','data/result_diabetes.csv'),
+  c('satellite','data/result_satellite.csv'),
+  c('sonar','data/result_sonar.csv'),
+  c('vehicle','data/result_vehicle.csv'),
+  c('vowel','data/result_vowel.csv')
+)
+
+rst <- data.frame()
+for(i in  1:length(file_list)) {
+  name <- file_list[[i]][1]
+  file <- file_list[[i]][2]
+  
+  current <- read.csv(file)
+  current$data <- name
+  
+  rst <- rbind(current,rst)
+}
+rst
+summary(rst)
  
+
+avg_stat <- ddply(
+  rst,
+  .(data,model),
+  function(x) {
+    c(
+      precision = mean(x$precision),
+      recall = mean(x$recall),
+      auc = mean(x$auc),
+      accuracy = mean(x$accuracy),
+      f1 = mean(x$f1)
+    )
+  }
+)
+
+avg_stat[avg_stat$model %in% c('gbdt + lr','lr'), c('data','model','auc')]
+avg_stat[avg_stat$model %in% c('gbdt + lr','gbdt'), c('data','model','auc')]
  
+
+
+
+ddply(
+  rst[rst$model != "gbdt + gbdt",],
+  .(model),
+  function(x) {
+    c(
+      precision = mean(x$precision),
+      recall = mean(x$recall),
+      auc = mean(x$auc),
+      accuracy = mean(x$accuracy),
+      f1 = mean(x$f1)
+    )
+  }
+)
+
