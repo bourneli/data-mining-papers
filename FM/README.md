@@ -22,3 +22,19 @@ http://baogege.info/2014/10/19/matrix-factorization-in-recommender-systems/
 
 线性回归算法
 http://blog.kamidox.com/gradient-descent.html
+
+
+如果作为分类器，需要使用Logit Loss函数作为损失函数，定义如下
+
+$$
+  L(\theta) = \ln{(1+e^{-yf(x,\theta)})}, y \in \{-1,1\},f(x,\theta)可以使线性回归，也可以是FM
+$$
+
+对Logit Loss求导
+
+$$
+  \frac{\partial L}{\partial \theta_i} = \frac{-ye^{-yf(x,\theta)}}{1+e^{-yf(x,\theta)}} \frac{\partial f(x,\theta)}{\partial \theta_i}   
+$$
+
+了解fm
+还要找fm 二元分类实现
