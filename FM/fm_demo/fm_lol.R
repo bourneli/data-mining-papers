@@ -36,3 +36,11 @@ test_label <- sapply(test_result, function(x) ifelse(x > 0.5, 1,0) )
 cm <- table(test_label, lol_tag[-train_index])
 cm['1','1'] / sum(cm['1',])
 cm['1','1'] / sum(cm[,'1'])
+
+
+
+
+## 安装libRM R库
+# devtools::install_github("andland/libFMexe")
+devtools::install_git('https://github.com/andland/libFMexe.git')
+ 
