@@ -33,8 +33,15 @@ $$
 对Logit Loss求导
 
 $$
-  \frac{\partial L}{\partial \theta_i} = \frac{-ye^{-yf(x,\theta)}}{1+e^{-yf(x,\theta)}} \frac{\partial f(x,\theta)}{\partial \theta_i}   
+  \frac{\partial L}{\partial \theta_i} = \frac{-ye^{-yf(x,\theta)}}{1+e^{-yf(x,\theta)}} \frac{\partial f(x,\theta)}{\partial \theta_i} = \frac{-y}{1+e^{yf(x,\theta)}}    \frac{\partial f(x,\theta)}{\partial \theta_i} = -y(1-\frac{1}{1+e^{-yf(x,\theta)}})\frac{\partial f(x,\theta)}{\partial \theta_i}
+
 $$
 
 了解fm
 还要找fm 二元分类实现
+
+
+
+km上有一篇文章，[SNG使用FM做的推荐](http://km.oa.com/group/22605/articles/show/292186?kmref=search&from_page=1&no=5),基于github上的一个[spark-libFM](https://github.com/zhengruifeng/spark-libFM/blob/master/src/main/scala/org/apache/spark/mllib/regression/FactorizationMachine.scala)开源实现修改的，使用了logit loss和cross entropy两个函数，线上效果后者较好，后面可以尝试。
+
+[spark-libFM](https://github.com/zhengruifeng/spark-libFM/blob/master/src/main/scala/org/apache/spark/mllib/regression/FactorizationMachine.scala)直接使用的spark mllib优化器，我只需要实现梯度就可以了，太棒了！可以获取中间输出结果，得到是否收敛。已经实现了二元梯度，看看梯度的实现。
