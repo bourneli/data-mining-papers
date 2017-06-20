@@ -45,3 +45,5 @@ $$
 km上有一篇文章，[SNG使用FM做的推荐](http://km.oa.com/group/22605/articles/show/292186?kmref=search&from_page=1&no=5),基于github上的一个[spark-libFM](https://github.com/zhengruifeng/spark-libFM/blob/master/src/main/scala/org/apache/spark/mllib/regression/FactorizationMachine.scala)开源实现修改的，使用了logit loss和cross entropy两个函数，线上效果后者较好，后面可以尝试。
 
 [spark-libFM](https://github.com/zhengruifeng/spark-libFM/blob/master/src/main/scala/org/apache/spark/mllib/regression/FactorizationMachine.scala)直接使用的spark mllib优化器，我只需要实现梯度就可以了，太棒了！可以获取中间输出结果，得到是否收敛。已经实现了二元梯度，看看梯度的实现。
+
+上面的源代码已分析完成，已经导入到spark 2.0环境，并且在github上创建[libFM](https://github.com/bourneli/libFM),后面的工作，就是在lol数据上试验，并且改进现有代码，添加新的特性。
