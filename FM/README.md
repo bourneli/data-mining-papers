@@ -101,3 +101,15 @@ k基本没有区别，所以取最小的
 
 
 可以添加动量，加速收敛。
+
+
+统计一下auc和参数组合
+
+
+### 动量
+
+在spark gradientdescent中添加动量时，犯了一个错误，
+
+更新是$\Delta w * momentum - stepSize * gradient$，
+
+而不是$ w * momentum - stepSize * gradient$

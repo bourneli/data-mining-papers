@@ -149,6 +149,7 @@ gd_momentum <- function(gradient_fun, cost_fun) {
       
       
       v <- p*v + alpha * gradient_fun(x,y,w)
+      # v <- -p*v + alpha * gradient_fun(x,y,w)
       w <- w - v
       current_cost <- cost_fun(x,y,w)
       
@@ -180,6 +181,7 @@ sgd_momentum <- function(gradient_fun, cost_fun) {
       
       i <- sample(length(w),1)
       v <- p*v + alpha * gradient_fun(x,y,w,i)
+      # v <- -p*v + alpha * gradient_fun(x,y,w,i)
       w <- w - v
       current_cost <- cost_fun(x,y,w)
       
