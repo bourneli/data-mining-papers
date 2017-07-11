@@ -24,9 +24,7 @@ lol_data <- scale(lol_data, center = col_min, scale = col_range)
 n <- nrow(lol_data)
 
 
-
-
-set.seed(123)
+set.seed(34676)
 train_index <- sample(n, n*0.7)
 
 # 训练数据
@@ -41,11 +39,11 @@ write.matrix.csr(
 
 
 # 重采样训练数据,调整正负样本比例
-pos_data <- subset(lol, lol$tag == 1)
+pos_data <- subset(lol[train_index,], lol[train_index,'tag'] == 1)
 
 neg_sub_rate <- 0.15
-set.seed(878)
-neg_data <- subset(lol, lol$tag == 0)
+set.seed(7899)
+neg_data <- subset(lol[train_index,], lol[train_index,'tag'] == 0)
 neg_index <- sample(nrow(neg_data), nrow(neg_data)*neg_sub_rate)
 sub_neg_data <- neg_data[neg_index,]
 
@@ -67,7 +65,7 @@ train_x2_norm <- scale(train_x2, center = col_min, scale = col_range)
 write.matrix.csr(
   x = as.matrix.csr(as.matrix(train_x2_norm)),
   y = train_y2,
-  file = 'data/train2.libsvm',
+  file = 'data/train3.libsvm',
   fac = F
 )
 
@@ -83,7 +81,7 @@ test_y <- lol_tag[-train_index]
 write.matrix.csr(
   x = as.matrix.csr(as.matrix(test_x)),
   y = test_y,
-  file = 'data/test.libsvm',
+  file = 'data/test3.libsvm',
   fac = F
 )
 

@@ -20,3 +20,14 @@
 
 
 虽然本论文主要是GBDT+LR而出名，但是其中介绍了一些实践的细节，是很值得借鉴的。
+
+
+
+## GBDT
+
+AdaBoost与GBM的关系
+* https://www.quora.com/What-is-the-difference-between-gradient-boosting-and-adaboost
+* https://stats.stackexchange.com/questions/164233/intuitive-explanations-of-differences-between-gradient-boosting-trees-gbm-ad
+
+
+AdaBoost是GBM的特例，历史上AdaBoost最早被发现，然后推导出更为通用的GBM。
